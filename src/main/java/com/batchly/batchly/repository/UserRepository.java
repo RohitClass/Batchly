@@ -19,7 +19,6 @@ public class UserRepository {
             "JOIN roles r ON u.role_id = r.id " +
             "LEFT JOIN role_permissions rp ON r.id = rp.role_id " +
             "WHERE u.email = ?";
-
     public Optional<UserWithPermissions> findByEmailWithPermissions(String email) {
         List<Map<String, Object>> rows = jdbc.queryForList(FIND_WITH_PERMS, email);
         if (rows.isEmpty())
