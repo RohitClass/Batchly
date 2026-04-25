@@ -1,28 +1,35 @@
 package com.batchly.batchly.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Entity
-@Table(name = "role_permissions")
-@Data
-@NoArgsConstructor
 public class RolePermission {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
-    @Column(name = "role_id", nullable = false)
-    private Long roleID;
-    @Column(name = "module_name", nullable = false)
+    private Long roleId;
     private String moduleName;
     private boolean canCreate;
     private boolean canRead;
     private boolean canUpdate;
     private boolean canDelete;
+
+    public RolePermission() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Long getRoleId() { return roleId; }
+    public void setRoleId(Long roleId) { this.roleId = roleId; }
+
+    public String getModuleName() { return moduleName; }
+    public void setModuleName(String moduleName) { this.moduleName = moduleName; }
+
+    public boolean isCanCreate() { return canCreate; }
+    public void setCanCreate(boolean canCreate) { this.canCreate = canCreate; }
+
+    public boolean isCanRead() { return canRead; }
+    public void setCanRead(boolean canRead) { this.canRead = canRead; }
+
+    public boolean isCanUpdate() { return canUpdate; }
+    public void setCanUpdate(boolean canUpdate) { this.canUpdate = canUpdate; }
+
+    public boolean isCanDelete() { return canDelete; }
+    public void setCanDelete(boolean canDelete) { this.canDelete = canDelete; }
 }

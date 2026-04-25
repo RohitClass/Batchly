@@ -1,41 +1,52 @@
 package com.batchly.batchly.repository;
 
+import com.batchly.batchly.dto.UserWithPermissions;
+import com.batchly.batchly.entity.RolePermission;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import com.batchly.batchly.dto.UserWithPermissions;
-import com.batchly.batchly.entity.RolePermission;
-
+@Repository
 public class UserRepository {
+
     private final JdbcTemplate jdbc;
-    private static final String FIND_WITH_PERMS = "SELECT u.id AS user_id, u.email, u.password, u.role_id, " +
-            "       r.name AS role_name, " +
-            "       rp.id AS perm_id, rp.module_name, " +
-            "       rp.can_create, rp.can_read, rp.can_update, rp.can_delete " +
-            "FROM users u " +
-            "JOIN roles r ON u.role_id = r.id " +
-            "LEFT JOIN role_permissions rp ON r.id = rp.role_id " +
-            "WHERE u.email = ?";
+
+    // Explicit constructor — fixes "blank final field jdbc not initialized"
+    public UserRepository(JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
+    }
+
+    private static final String FIND_WITH_PERMS =
+        "SELECT u.id AS user_id, u.email, u.password, u.role_id, " +
+        "       r.name AS role_name, " +
+        "       rp.id AS perm_id, rp.module_name, " +
+        "       rp.can_create, rp.can_read, rp.can_update, rp.can_delete " +
+        "FROM users u " +
+        "JOIN roles r ON u.role_id = r.id " +
+        "LEFT JOIN role_permissions rp ON r.id = rp.role_id " +
+        "WHERE u.email = ?";
+
     public Optional<UserWithPermissions> findByEmailWithPermissions(String email) {
         List<Map<String, Object>> rows = jdbc.queryForList(FIND_WITH_PERMS, email);
-        if (rows.isEmpty())
-            return Optional.empty();
+        if (rows.isEmpty()) return Optional.empty();
         return Optional.of(mapRows(rows));
     }
 
     private UserWithPermissions mapRows(List<Map<String, Object>> rows) {
         Map<String, Object> first = rows.get(0);
+
         UserWithPermissions u = new UserWithPermissions();
         u.setUserId(toLong(first.get("user_id")));
         u.setEmail((String) first.get("email"));
         u.setPassword((String) first.get("password"));
         u.setRoleId(toLong(first.get("role_id")));
         u.setRoleName((String) first.get("role_name"));
-        rows.forEach(row-> {
-            if(row.get("perm_id")!= null){
+
+        rows.forEach(row -> {
+            if (row.get("perm_id") != null) {
                 RolePermission p = new RolePermission();
                 p.setId(toLong(row.get("perm_id")));
                 p.setRoleId(toLong(row.get("role_id")));
@@ -49,15 +60,18 @@ public class UserRepository {
         });
         return u;
     }
+
     public void save(String email, String encodedPassword, Long roleId) {
         jdbc.update(
             "INSERT INTO users (email, password, role_id) VALUES (?, ?, ?)",
             email, encodedPassword, roleId
         );
     }
-     public boolean existsByEmail(String email) {
+
+    public boolean existsByEmail(String email) {
         Integer count = jdbc.queryForObject(
-            "SELECT COUNT(*) FROM users WHERE email = ?", Integer.class, email
+            "SELECT COUNT(*) FROM users WHERE email = ?",
+            Integer.class, email
         );
         return count != null && count > 0;
     }
