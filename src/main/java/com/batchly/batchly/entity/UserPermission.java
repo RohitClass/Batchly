@@ -12,23 +12,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "role_permission")
-public class RolePermission {
+@Table(name = "user_permission")
+public class UserPermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long role_id;
     private Long permission_id;
+    private Long user_id;
     @CreationTimestamp
     @Column(name = "created_at" , updatable = false)
     private LocalDateTime createdAt;
-
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
-    public Long getRoleId() { return this.role_id; }
-    public void setRoleId(Long role_id) { this.role_id = role_id; }
-     public Long getPermissionId() { return this.permission_id; }
+    public Long getPermissionId() { return this.permission_id; }
     public void setPermissionId(Long permission_id) { this.permission_id = permission_id; }
+     public Long getUserId() { return this.user_id; }
+    public void setUserId(Long user_id) { this.user_id = user_id; }
+     public LocalDateTime getCreatedAt() { return this.createdAt; }
 }

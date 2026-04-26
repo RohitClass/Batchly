@@ -12,12 +12,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="role")
-public class Role {
+@Table(name="role_user")
+public class RoleUser {
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 private Long id;
-private String name;
+private Long user_id;
+private Long role_id;
 @CreationTimestamp
 @Column(name = "created_at",updatable = false)
 private LocalDateTime createdAt;
@@ -27,11 +28,17 @@ public Long getId(){
 public void setId(Long id){
     this.id=id;
 }
-public String getName(){
-    return this.name;
+public Long getUserId(){
+    return this.user_id;
 }
-public void setName(String name){
-    this.name=name;
+public void setUserId(Long user_id){
+    this.user_id=user_id;
+}
+public Long getRoleId(){
+    return this.role_id;
+}
+public void setRoleId(Long role_id){
+    this.role_id=role_id;
 }
 public LocalDateTime getcreatedAt(){
     return this.createdAt;

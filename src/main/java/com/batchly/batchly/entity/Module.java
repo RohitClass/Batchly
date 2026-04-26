@@ -12,8 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="role")
-public class Role {
+@Table(name="modules")
+public class Module {
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 private Long id;
