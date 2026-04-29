@@ -2,61 +2,58 @@ package com.batchly.batchly.service;
 
 import com.batchly.batchly.dto.LoginRequest;
 import com.batchly.batchly.dto.LoginResponse;
-import com.batchly.batchly.dto.RegisterRequest;
-import com.batchly.batchly.repository.RoleRepository;
-import com.batchly.batchly.repository.UserRepository;
+// import com.batchly.batchly.repository.UserRepository;
 import com.batchly.batchly.security.CustomUserDetailsService;
 import com.batchly.batchly.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepo;
-    private final RoleRepository roleRepo;
-    private final PasswordEncoder passwordEncoder;
+//     private final UserRepository userRepo;
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
 
-    public LoginResponse login(LoginRequest req) {
-        authManager.authenticate(
-            new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
-        );
+  public LoginResponse login(LoginRequest req) {
 
-        UserDetails user = userDetailsService.loadUserByUsername(req.getEmail());
-        String token = jwtUtil.generateToken(user);
+    // 🔥 ADD THIS BLOCK (password debug)
+    UserDetails debugUser = userDetailsService.loadUserByUsername(req.getEmail());
 
-        List<String> perms = user.getAuthorities().stream()
-            .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.toList());
+    boolean match = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
+            .matches(req.getPassword(), debugUser.getPassword());
 
-        String role = perms.stream()
-            .filter(p -> p.startsWith("ROLE_"))
-            .findFirst().orElse("");
+    System.out.println("Entered Password: " + req.getPassword());
+    System.out.println("Stored Hash: " + debugUser.getPassword());
+    System.out.println("Password Match: " + match);
 
-        return new LoginResponse(token, role, perms);
-    }
+    // 1. Authenticate
+    Authentication authentication = authManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                    req.getEmail(),
+                    req.getPassword()
+            )
+    );
 
-    public void register(RegisterRequest req) {
-        if (userRepo.existsByEmail(req.getEmail())) {
-            throw new RuntimeException("Email already in use");
-        }
-        roleRepo.findById(req.getRoleId())
-            .orElseThrow(() -> new RuntimeException("Role not found"));
+    // 2. Get authenticated user
+    UserDetails user = (UserDetails) authentication.getPrincipal();
 
-        userRepo.save(req.getEmail(),
-            passwordEncoder.encode(req.getPassword()),
-            req.getRoleId());
-    }
+    // 3. Generate token
+    String token = jwtUtil.generateToken(user);
+
+    // 4. (optional) store token
+    userDetailsService.updateToken(req.getEmail(), token);
+
+    // 5. Return response
+    return new LoginResponse(
+            token,
+            user.getUsername()
+    );
+}
 }

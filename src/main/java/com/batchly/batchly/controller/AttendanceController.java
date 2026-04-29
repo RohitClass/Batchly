@@ -31,4 +31,5 @@ public class AttendanceController {
     public ResponseEntity<String> delete(@PathVariable Long id) {
         return ResponseEntity.ok("Attendance deleted: " + id);
     }
+
 }
