@@ -8,8 +8,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class LoginResponse {
+public class CoachingResponse {
     private Long id;
+    private Long user_id;
     private String email;
     private String userName;
     private String phoneNo;

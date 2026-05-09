@@ -2,10 +2,11 @@ package com.batchly.batchly.service;
 
 import com.batchly.batchly.dto.LoginRequest;
 import com.batchly.batchly.dto.LoginResponse;
-// import com.batchly.batchly.dto.LoginResponseDetails;
 import com.batchly.batchly.dto.ModulePermissionDTO;
+import com.batchly.batchly.dto.RegisterRequest;
+import com.batchly.batchly.entity.User;
+import com.batchly.batchly.repository.UserRepository;
 import com.batchly.batchly.security.CustomUserDetails;
-// import com.batchly.batchly.repository.UserRepository;
 import com.batchly.batchly.security.CustomUserDetailsService;
 import com.batchly.batchly.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,6 +28,8 @@ public class AuthService {
         private final AuthenticationManager authManager;
         private final JwtUtil jwtUtil;
         private final CustomUserDetailsService userDetailsService;
+        private final UserRepository userRepository;
+        private final PasswordEncoder passwordEncoder;
 
         public LoginResponse login(LoginRequest req) {
 
@@ -62,8 +66,38 @@ public class AuthService {
                                 user.getUserName(),
                                 user.getPhoneNo(),
                                 token,
+                                user.getRole(),
                                 user.getCreatedAt(),
                                 user.getUpdatedAt(),
                                 modules);
+        }
+
+        public boolean register(RegisterRequest req) {
+
+                // 1. Check if email already exists
+                if (userRepository.findByEmailIgnoreCase(req.getEmail()).isPresent()) {
+                        return false;
+                }
+
+                // 2. Create user
+                User user = new User();
+
+                user.setUserName(this.generateUsername(req.getEmail()));
+                user.setEmail(req.getEmail());
+                user.setPhoneNo(req.getPhone_no());
+                user.setPassword(passwordEncoder.encode(req.getPassword()));
+                user.setRole("COACHING");
+              
+
+                // 3. Save to DB
+                userRepository.saveUser(user);
+                // 5. Return response
+                return true;
+        }
+
+        private String generateUsername(String email) {
+                String base = email.split("@")[0]; // aman@gmail.com → aman
+                String suffix = String.valueOf(System.currentTimeMillis()).substring(7); // short unique part
+                return base + "_" + suffix;
         }
 }

@@ -25,13 +25,13 @@ public class UserRepository {
     private static final String FIND_WITH_EMAIL = "SELECT * FROM users WHERE email=?";
     private static final String FIND_WITH_PHONE = "SELECT * FROM users WHERE phone_no=?";
     private static final String FIND_WITH_USER_NAME = "SELECT * FROM users WHERE user_name=?";
-   private static final String FIND_USER_MODULE =
-        "SELECT m.name AS module_name, p.permission_type AS permission_name " +
-        "FROM users u " +
-        "JOIN user_permission up ON u.id = up.user_id " +
-        "JOIN permissions p ON up.permission_id = p.id " +
-        "JOIN modules m ON p.module_id = m.id " +
-        "WHERE u.email = ? OR u.phone_no=? OR u.user_name=?";
+    private static final String FIND_USER_MODULE = "SELECT m.name AS module_name, p.permission_type AS permission_name "
+            +
+            "FROM users u " +
+            "JOIN user_permission up ON u.id = up.user_id " +
+            "JOIN permissions p ON up.permission_id = p.id " +
+            "JOIN modules m ON p.module_id = m.id " +
+            "WHERE u.email = ? OR u.phone_no=? OR u.user_name=?";
 
     public Optional<User> findByEmailIgnoreCase(String email) {
         List<Map<String, Object>> rows = jdbc.queryForList(FIND_WITH_EMAIL, email);
@@ -94,9 +94,24 @@ public class UserRepository {
         jdbc.update(sql, token, email);
     }
 
+    public void saveUser(User user) {
+
+        String sql = "INSERT INTO users " +
+                "(user_name, email, phone_no, password, role) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
+        jdbc.update(sql,
+                user.getUserName(),
+                user.getEmail(),
+                user.getPhoneNo(),
+                user.getPassword(),
+                user.getRole()
+            );
+    }
+
     public List<ModulePermissionDTO> roles(String email) {
 
-        List<Map<String, Object>> rows = jdbc.queryForList(FIND_USER_MODULE, email,email,email);
+        List<Map<String, Object>> rows = jdbc.queryForList(FIND_USER_MODULE, email, email, email);
 
         Map<String, List<String>> moduleMap = new HashMap<>();
 

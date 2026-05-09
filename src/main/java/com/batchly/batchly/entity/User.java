@@ -26,6 +26,7 @@ public class User {
     private String phone_no;
     private String password;
     private String token;
+    private String role;
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -77,6 +78,13 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
     public LocalDateTime getCreateddAt() {
         return this.createdAt;

@@ -32,6 +32,8 @@ public CustomUserDetails loadUserByUsername(String input) throws UsernameNotFoun
             user.getUserName(),
             user.getPhoneNo(),
             user.getPassword(),
+            user.getToken(),
+            user.getRole(),
             user.getCreateddAt(),
             user.getUpdatedAt(),
             new ArrayList<>()
@@ -54,9 +56,9 @@ public CustomUserDetails loadUserByUsername(String input) throws UsernameNotFoun
 
         List<ModulePermissionDTO> modules = userRepository.roles(email);
 
-        if (modules == null || modules.isEmpty()) {
-            throw new RuntimeException("No modules/permissions found for user");
-        }
+        // if (modules == null || modules.isEmpty()) {
+        //     throw new RuntimeException("No modules/permissions found for user");
+        // }
 
         return modules;
     }

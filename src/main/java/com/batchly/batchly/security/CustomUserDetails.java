@@ -13,10 +13,12 @@ public class CustomUserDetails implements UserDetails {
     private String userName;
     private String phoneNo;
     private String password;
+    private String token;
+    private String role;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
+    
     private Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(
@@ -25,6 +27,8 @@ public class CustomUserDetails implements UserDetails {
             String userName,
             String phoneNo,
             String password,
+            String token,
+            String role,
             LocalDateTime createdAt,
             LocalDateTime updatedAt,
             Collection<? extends GrantedAuthority> authorities
@@ -34,6 +38,8 @@ public class CustomUserDetails implements UserDetails {
         this.userName = userName;
         this.phoneNo = phoneNo;
         this.password = password;
+        this.token = token;
+        this.role = role;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.authorities = authorities;
@@ -43,6 +49,8 @@ public class CustomUserDetails implements UserDetails {
     public String getEmail() { return email; }
     public String getUserName() { return userName; }
     public String getPhoneNo() { return phoneNo; }
+    public String getToken() { return token; }
+    public String getRole() { return role; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
